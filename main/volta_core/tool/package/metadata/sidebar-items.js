@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["default_binary_name"],"mod":["serde_bins"],"struct":["BinConfig","GlobalYarnManifest","PackageConfig","PackageManifest","RawPlatformSpec"]};

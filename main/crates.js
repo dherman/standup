@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["archive","fs_utils","progress_read","test_support","validate_npm_package_name","volta","volta_core","volta_layout","volta_layout_macro","volta_migrate","volta_shim"];

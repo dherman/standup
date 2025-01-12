@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["default_install_dir","env_paths","volta_home","volta_install"],"mod":["unix"],"static":["VOLTA_HOME","VOLTA_INSTALL"]};

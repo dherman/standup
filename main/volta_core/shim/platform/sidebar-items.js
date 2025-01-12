@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["create","entry_to_shim_name"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ErrorKind","ExitCode"],"fn":["report_error"],"mod":["kind","reporter"],"struct":["Inner","VoltaError"],"trait":["Context"],"type":["Fallible"]};

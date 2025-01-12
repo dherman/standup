@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["PERMISSIONS_CTA","REPORT_BUG_CTA"],"enum":["ErrorKind"]};

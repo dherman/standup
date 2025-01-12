@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["RECURSION_ENV_VAR","VOLTA_BYPASS"],"fn":["debug_active_image","debug_no_platform","execute_shim","execute_tool","format_tool_version","get_executor","get_tool_name","tool_name_from_file_name"],"mod":["binary","executor","node","npm","npx","parser","pnpm","yarn"]};

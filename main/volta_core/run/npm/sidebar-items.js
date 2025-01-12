@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["command","current_project_name","execution_context"]};

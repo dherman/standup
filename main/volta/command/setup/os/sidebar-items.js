@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["add_bash_profiles","add_fish_profile","add_zsh_profile","determine_profiles","format_home","read_profile_without_volta","setup_environment","write_profile_fish","write_profile_sh"]};

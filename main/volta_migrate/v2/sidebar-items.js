@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["clear_default_npm","remove_npm_version_from_node_image_dir","shift_node_images"],"struct":["V2"]};

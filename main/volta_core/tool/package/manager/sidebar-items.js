@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PackageManager"],"fn":["get_npm_package_name","get_pnpm_or_yarn_package_name","get_single_directory_name"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["find_closest_root","is_dependency","is_node_modules","is_node_root","is_project_root"],"mod":["serial"],"struct":["LazyProject","PartialPlatform","Project"]};

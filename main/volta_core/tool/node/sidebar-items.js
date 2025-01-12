@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["NODE_DISTRO_ARCH","NODE_DISTRO_EXTENSION","NODE_DISTRO_IDENTIFIER","NODE_DISTRO_OS"],"fn":["load_default_npm_version","resolve"],"mod":["fetch","metadata","resolve"],"struct":["Node","NodeVersion"]};

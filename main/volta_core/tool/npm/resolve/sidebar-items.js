@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["fetch_npm_index","resolve","resolve_semver","resolve_tag"]};

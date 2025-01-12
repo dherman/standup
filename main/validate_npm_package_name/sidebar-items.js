@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BLACKLIST","BUILTINS"],"enum":["Validity"],"fn":["done","validate"],"static":["ENCODE_URI_SET","SCOPED_PACKAGE","SPECIAL_CHARS"]};

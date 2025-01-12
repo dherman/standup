@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["send_events","spawn_process","write_events_file"]};

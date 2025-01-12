@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["process","process_error"],"struct":["ProcessBuilder","ProcessError"]};

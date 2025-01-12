@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Executor","ToolKind"],"struct":["InternalInstallCommand","PackageInstallCommand","PackageLinkCommand","PackageUpgradeCommand","ToolCommand","UninstallCommand"]};

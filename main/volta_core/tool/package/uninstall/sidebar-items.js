@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["binaries_from_package","remove_config_and_shim","remove_shared_link_dir","uninstall"]};

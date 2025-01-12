@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["NPM_ABBREVIATED_ACCEPT_HEADER"],"fn":["fetch_npm_registry","find_unpack_dir","public_registry_index","public_registry_package","scoped_public_registry_package"],"struct":["PackageDetails","PackageIndex","RawDistInfo","RawPackageMetadata","RawPackageVersionInfo"]};

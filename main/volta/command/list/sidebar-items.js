@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Filter","Format","Package","PackageManagerKind","Source","Subcommand"],"mod":["human","plain","toolchain"],"struct":["List","Node","PackageDetails","PackageManager"]};

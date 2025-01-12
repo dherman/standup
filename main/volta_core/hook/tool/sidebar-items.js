@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARCH_TEMPLATE","EXTENSION_TEMPLATE","FILENAME_TEMPLATE","OS_TEMPLATE","VERSION_TEMPLATE"],"enum":["DistroHook","MetadataHook"],"fn":["calculate_extension","execute_binary"],"static":["REL_PATH","REL_PATH_PARENT"],"struct":["YarnIndexHook"]};

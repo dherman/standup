@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MatchKind"],"fn":["execs","find_mismatch","lines_match","substitute_macros","zip_all"],"struct":["Execs","ZipAll"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["VOLTA_FEATURE_PNPM"],"mod":["command","error","event","fs","hook","inventory","layout","log","monitor","platform","project","run","session","shim","signal","style","sync","tool","toolchain","version"]};

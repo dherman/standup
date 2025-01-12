@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_installed_packages","is_migrated_config","migrate_packages","migrate_single_package"],"mod":["config"],"struct":["V3"]};

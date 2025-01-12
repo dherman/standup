@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NeedsScope","PackageManager"],"fn":["link_package_to_shared_dir","persist_install","setup_staging_directory","uninstall"],"mod":["configure","install","manager","metadata","uninstall"],"struct":["BinConfig","DirectInstall","InPlaceUpgrade","Package","PackageConfig","PackageManifest"]};

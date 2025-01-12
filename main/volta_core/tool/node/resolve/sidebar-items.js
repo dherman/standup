@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["match_node_version","max_age","public_node_version_index","read_cached_opt","resolve","resolve_latest","resolve_lts","resolve_node_versions","resolve_semver"]};

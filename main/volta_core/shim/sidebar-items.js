@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ShimResult"],"fn":["create","delete","get_shim_list_deduped","regenerate_shims_for_dir"],"mod":["platform"]};

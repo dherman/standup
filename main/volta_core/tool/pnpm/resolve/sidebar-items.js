@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["fetch_pnpm_index","resolve","resolve_semver","resolve_tag"]};

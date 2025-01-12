@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["default_home_dir","env_paths"]};

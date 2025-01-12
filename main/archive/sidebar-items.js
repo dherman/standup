@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ArchiveError","Origin"],"fn":["content_length","fetch_native","load_native"],"mod":["tarball","zip"],"struct":["Tarball","Zip"],"trait":["Archive"]};

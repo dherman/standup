@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["determine_remote_url","fetch","fetch_remote_distro","load_cached_distro","load_default_npm_version","npm_manifest_path","public_node_server_root","save_default_npm_version","unpack_archive"],"struct":["Manifest"]};

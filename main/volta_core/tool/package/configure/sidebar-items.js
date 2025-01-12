@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["parse_manifest","validate_bins","write_config_and_shims"]};

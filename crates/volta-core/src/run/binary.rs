@@ -8,14 +8,31 @@ use crate::error::{Context, ErrorKind, Fallible};
 use crate::layout::volta_home;
 use crate::platform::{Platform, Sourced, System};
 use crate::session::Session;
+use crate::style::{note_prefix, tool_version};
 use crate::tool::package::BinConfig;
-use log::debug;
+use log::{debug, info};
 
 /// Determine the correct command to run for a 3rd-party binary
 ///
 /// Will detect if we should delegate to the project-local version or use the default version
 pub(super) fn command(exe: &OsStr, args: &[OsString], session: &mut Session) -> Fallible<Executor> {
     let bin = exe.to_string_lossy().to_string();
+
+    fn create_default_tool_executor(
+        default_tool: DefaultBinary,
+        bin: String,
+        args: &[OsString],
+    ) -> Fallible<Executor> {
+        let mut command = ToolCommand::new(
+            default_tool.bin_path,
+            args,
+            Some(default_tool.platform),
+            ToolKind::DefaultBinary(bin),
+        );
+        command.env("NODE_PATH", shared_module_path()?);
+        Ok(command.into())
+    }
+
     // First try to use the project toolchain
     if let Some(project) = session.project()? {
         // Check if the executable is a direct dependency
@@ -49,6 +66,17 @@ pub(super) fn command(exe: &OsStr, args: &[OsString], session: &mut Session) -> 
                             ToolKind::Yarn,
                         )
                         .into());
+                    } else if let Some(default_tool) = DefaultBinary::from_name(exe, session)? {
+                        // if local binary not found, use global version
+                        info!(
+                            "{} Local binary {} not found, using global {} from:\n    {}\n",
+                            note_prefix(),
+                            bin,
+                            tool_version(&bin, ""),
+                            default_tool.bin_path.display()
+                        );
+
+                        return create_default_tool_executor(default_tool, bin, args);
                     } else {
                         return Err(ErrorKind::ProjectLocalBinaryNotFound {
                             command: exe.to_string_lossy().to_string(),
@@ -68,15 +96,7 @@ pub(super) fn command(exe: &OsStr, args: &[OsString], session: &mut Session) -> 
             default_tool.bin_path.display()
         );
 
-        let mut command = ToolCommand::new(
-            default_tool.bin_path,
-            args,
-            Some(default_tool.platform),
-            ToolKind::DefaultBinary(bin),
-        );
-        command.env("NODE_PATH", shared_module_path()?);
-
-        return Ok(command.into());
+        return create_default_tool_executor(default_tool, bin, args);
     }
 
     // At this point, the binary is not known to Volta, so we have no platform to use to execute it

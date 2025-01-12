@@ -316,7 +316,10 @@ impl InstallArgs<'_> {
                     let command = PackageInstallCommand::new(args, platform, self.manager)?;
                     executors.push(command.into());
                 }
-                Ok(internal) => executors.push(InternalInstallCommand::new(internal).into()),
+                Ok(internal) => {
+                    // TODO: gotta fail here or something?
+                    executors.push(InternalInstallCommand::new(internal).into())
+                }
             }
         }
 

@@ -288,7 +288,13 @@ impl PackageInstallCommand {
             .status()
             .with_context(|| ErrorKind::BinaryExecError)?;
 
-        if status.success() {
+        let was_npm_dry_run = self.installer.get_manager() == PackageManager::Npm
+            && self
+                .command
+                .get_args()
+                .any(|a| a == "-d" || a == "--dry-run");
+
+        if status.success() && !was_npm_dry_run {
             self.installer.complete_install(&image)?;
         }
 

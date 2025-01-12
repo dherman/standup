@@ -174,6 +174,10 @@ impl DirectInstall {
         link_package_to_shared_dir(&name, manager)?;
         configure::write_config_and_shims(&name, &manifest, image, manager)
     }
+
+    pub fn get_manager(&self) -> PackageManager {
+        self.manager
+    }
 }
 
 /// Helper struct for direct in-place upgrades using `npm update -g` or `yarn global upgrade`

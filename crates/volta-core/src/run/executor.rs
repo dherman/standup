@@ -6,8 +6,8 @@ use std::os::unix::process::ExitStatusExt;
 use std::os::windows::process::ExitStatusExt;
 use std::process::{Command, ExitStatus};
 
-use super::RECURSION_ENV_VAR;
-use crate::command::create_command;
+use super::{RECURSION_ENV_VAR, RECURSION_LIMIT};
+use crate::command::{command_on_path, create_command};
 use crate::error::{Context, ErrorKind, Fallible};
 use crate::layout::volta_home;
 use crate::platform::{CliPlatform, Platform, System};
@@ -175,7 +175,7 @@ impl ToolCommand {
     }
 
     /// Runs the command, returning the `ExitStatus` if it successfully launches
-    pub fn execute(mut self, session: &mut Session) -> Fallible<ExitStatus> {
+    pub fn execute(self, session: &mut Session) -> Fallible<ExitStatus> {
         let (path, on_failure) = match self.kind {
             ToolKind::Node => super::node::execution_context(self.platform, session)?,
             ToolKind::Npm => super::npm::execution_context(self.platform, session)?,
@@ -191,11 +191,24 @@ impl ToolCommand {
             ToolKind::Bypass(command) => (System::path()?, ErrorKind::BypassError { command }),
         };
 
-        self.command.env(RECURSION_ENV_VAR, "1");
-        self.command.env("PATH", path);
+        // Do recursive call limit check
+        let recursion = match std::env::var(RECURSION_ENV_VAR) {
+            Err(_) => 1u8,
+            Ok(var) => var
+                .parse::<u8>()
+                .with_context(|| ErrorKind::ParseRecursionEnvError)?,
+        };
+        if recursion > RECURSION_LIMIT {
+            return Err(ErrorKind::RecursionLimit.into());
+        }
 
-        pass_control_to_shim();
-        self.command.status().with_context(|| on_failure)
+        command_on_path(self.command, path)
+            .and_then(|mut command| {
+                command.env(RECURSION_ENV_VAR, (recursion + 1).to_string());
+                pass_control_to_shim();
+                command.status().with_context(|| ErrorKind::BinaryExecError)
+            })
+            .with_context(|| on_failure)
     }
 }
 
@@ -274,17 +287,17 @@ impl PackageInstallCommand {
 
     /// Runs the install command, applying the necessary modifications to install into the Volta
     /// data directory
-    pub fn execute(mut self, session: &mut Session) -> Fallible<ExitStatus> {
+    pub fn execute(self, session: &mut Session) -> Fallible<ExitStatus> {
         let _lock = VoltaLock::acquire();
         let image = self.platform.checkout(session)?;
         let path = image.path()?;
 
-        self.command.env(RECURSION_ENV_VAR, "1");
-        self.command.env("PATH", path);
-        self.installer.setup_command(&mut self.command);
+        let mut command = command_on_path(self.command, path)?;
 
-        let status = self
-            .command
+        command.env(RECURSION_ENV_VAR, "1");
+        self.installer.setup_command(&mut command);
+
+        let status = command
             .status()
             .with_context(|| ErrorKind::BinaryExecError)?;
 
@@ -350,20 +363,19 @@ impl PackageLinkCommand {
     /// directory.
     ///
     /// This will also check for some common failure cases and alert the user
-    pub fn execute(mut self, session: &mut Session) -> Fallible<ExitStatus> {
+    pub fn execute(self, session: &mut Session) -> Fallible<ExitStatus> {
         self.check_linked_package(session)?;
 
         let image = self.platform.checkout(session)?;
         let path = image.path()?;
 
-        self.command.env(RECURSION_ENV_VAR, "1");
-        self.command.env("PATH", path);
-        let package_root = volta_home()?.package_image_dir(&self.tool);
-        PackageManager::Npm.setup_global_command(&mut self.command, package_root);
+        let mut command = command_on_path(self.command, path)?;
 
-        self.command
-            .status()
-            .with_context(|| ErrorKind::BinaryExecError)
+        command.env(RECURSION_ENV_VAR, "1");
+        let package_root = volta_home()?.package_image_dir(&self.tool);
+        PackageManager::Npm.setup_global_command(&mut command, package_root);
+
+        command.status().with_context(|| ErrorKind::BinaryExecError)
     }
 
     /// Check for possible failure cases with the linked package:
@@ -465,19 +477,19 @@ impl PackageUpgradeCommand {
     ///
     /// Will also check for common failure cases, such as non-existant package or wrong package
     /// manager
-    pub fn execute(mut self, session: &mut Session) -> Fallible<ExitStatus> {
+    pub fn execute(self, session: &mut Session) -> Fallible<ExitStatus> {
         self.upgrader.check_upgraded_package()?;
 
         let _lock = VoltaLock::acquire();
         let image = self.platform.checkout(session)?;
         let path = image.path()?;
 
-        self.command.env(RECURSION_ENV_VAR, "1");
-        self.command.env("PATH", path);
-        self.upgrader.setup_command(&mut self.command);
+        let mut command = command_on_path(self.command, path)?;
 
-        let status = self
-            .command
+        command.env(RECURSION_ENV_VAR, "1");
+        self.upgrader.setup_command(&mut command);
+
+        let status = command
             .status()
             .with_context(|| ErrorKind::BinaryExecError)?;
 

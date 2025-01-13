@@ -32,6 +32,7 @@ mod yarn;
 /// Note: This is explicitly _removed_ when calling a command through `volta run`, as that will
 /// never happen due to the Volta environment.
 const RECURSION_ENV_VAR: &str = "_VOLTA_TOOL_RECURSION";
+const RECURSION_LIMIT: u8 = 10;
 const VOLTA_BYPASS: &str = "VOLTA_BYPASS";
 
 /// Execute a shim command, based on the command-line arguments to the current process

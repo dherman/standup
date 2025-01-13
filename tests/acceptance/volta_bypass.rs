@@ -15,19 +15,10 @@ fn shim_skips_platform_checks_on_bypass() {
         )
         .build();
 
-    #[cfg(unix)]
     assert_that!(
         s.process(shim_exe()),
         execs()
             .with_status(ExitCode::ExecutionFailure as i32)
             .with_stderr_contains("VOLTA_BYPASS is enabled[..]")
-    );
-
-    #[cfg(windows)]
-    assert_that!(
-        s.process(shim_exe()),
-        execs()
-            .with_status(ExitCode::UnknownError as i32)
-            .with_stderr_contains("[..]is not recognized as an internal or external command[..]")
     );
 }

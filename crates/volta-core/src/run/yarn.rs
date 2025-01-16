@@ -43,13 +43,13 @@ pub(super) fn execution_context(
 ) -> Fallible<(OsString, ErrorKind)> {
     match platform {
         Some(plat) => {
-            validate_platform_yarn(&plat)?;
+            let on_failure = platform_yarn_error(&plat);
 
             let image = plat.checkout(session)?;
             let path = image.path()?;
             debug_active_image(&image);
 
-            Ok((path, ErrorKind::BinaryExecError))
+            Ok((path, on_failure))
         }
         None => {
             let path = System::path()?;
@@ -59,13 +59,13 @@ pub(super) fn execution_context(
     }
 }
 
-fn validate_platform_yarn(platform: &Platform) -> Fallible<()> {
+fn platform_yarn_error(platform: &Platform) -> ErrorKind {
     match &platform.yarn {
-        Some(_) => Ok(()),
+        Some(_) => ErrorKind::BinaryExecError,
         None => match platform.node.source {
-            Source::Project => Err(ErrorKind::NoProjectYarn.into()),
-            Source::Default | Source::Binary => Err(ErrorKind::NoDefaultYarn.into()),
-            Source::CommandLine => Err(ErrorKind::NoCommandLineYarn.into()),
+            Source::Project => ErrorKind::NoProjectYarn,
+            Source::Default | Source::Binary => ErrorKind::NoDefaultYarn,
+            Source::CommandLine => ErrorKind::NoCommandLineYarn,
         },
     }
 }

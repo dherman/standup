@@ -225,40 +225,29 @@ If you run into problems running Volta, create {} and run `volta setup` again.",
 
 #[cfg(windows)]
 mod os {
-    use std::process::Command;
-
     use log::debug;
     use volta_core::error::{Context, ErrorKind, Fallible};
     use volta_core::layout::volta_home;
-    use winreg::enums::HKEY_CURRENT_USER;
+    use winreg::enums::{HKEY_CURRENT_USER, KEY_READ, KEY_WRITE};
     use winreg::RegKey;
 
     pub fn setup_environment() -> Fallible<()> {
         let shim_dir = volta_home()?.shim_dir().to_string_lossy().to_string();
         let hkcu = RegKey::predef(HKEY_CURRENT_USER);
         let env = hkcu
-            .open_subkey("Environment")
+            .open_subkey_with_flags("Environment", KEY_READ | KEY_WRITE)
             .with_context(|| ErrorKind::ReadUserPathError)?;
         let path: String = env
             .get_value("Path")
             .with_context(|| ErrorKind::ReadUserPathError)?;
 
         if !path.contains(&shim_dir) {
-            // Use `setx` command to edit the user Path environment variable
-            let mut command = Command::new("setx");
-            command.arg("Path");
-            command.arg(format!("{};{}", shim_dir, path));
+            let path = format!("{};{}", shim_dir, path);
+            debug!("Modifying User Path to: {}", path);
 
-            debug!("Modifying User Path with command: {:?}", command);
-            let output = command
-                .output()
+            // see https://superuser.com/a/387625
+            env.set_value("Path", &path)
                 .with_context(|| ErrorKind::WriteUserPathError)?;
-
-            if !output.status.success() {
-                debug!("[setx stderr]\n{}", String::from_utf8_lossy(&output.stderr));
-                debug!("[setx stdout]\n{}", String::from_utf8_lossy(&output.stdout));
-                return Err(ErrorKind::WriteUserPathError.into());
-            }
         }
 
         Ok(())

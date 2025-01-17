@@ -4,13 +4,15 @@ use super::{
     check_fetched, check_shim_reachable, debug_already_fetched, info_fetched, info_installed,
     info_pinned, info_project_version, FetchStatus, Tool,
 };
-use crate::error::{ErrorKind, Fallible};
+use crate::error::{Context, ErrorKind, Fallible};
+use crate::fs::{dir_entry_match, ok_if_not_found, remove_dir_if_exists, remove_file_if_exists};
 use crate::inventory::node_available;
+use crate::layout::volta_home;
 use crate::session::Session;
-use crate::style::{note_prefix, tool_version};
+use crate::style::{note_prefix, success_prefix, tool_version};
 use crate::sync::VoltaLock;
 use cfg_if::cfg_if;
-use log::info;
+use log::{info, warn};
 use node_semver::Version;
 
 mod fetch;
@@ -281,6 +283,44 @@ impl Tool for Node {
         } else {
             Err(ErrorKind::NotInPackage.into())
         }
+    }
+    fn uninstall(self: Box<Self>, _session: &mut Session) -> Fallible<()> {
+        let home = volta_home()?;
+        // Acquire a lock on the Volta directory, if possible, to prevent concurrent changes
+        let _lock: Result<VoltaLock, crate::error::VoltaError> = VoltaLock::acquire();
+
+        let node_dir = home.node_image_root_dir().join(self.version.to_string());
+
+        dir_entry_match(home.node_inventory_dir(), |entry| {
+            let path = entry.path();
+
+            if path.is_file() {
+                match path.file_name().and_then(|name| name.to_str()) {
+                    Some(file_name) if file_name.contains(&self.version.to_string()) => Some(path),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        })
+        .or_else(ok_if_not_found)
+        .with_context(|| ErrorKind::ReadDirError {
+            dir: home.node_inventory_dir().to_path_buf(),
+        })
+        .map(|files| {
+            files.iter().for_each(|file| {
+                remove_file_if_exists(file);
+            })
+        });
+
+        if node_dir.exists() {
+            remove_dir_if_exists(&node_dir)?;
+            info!("{} 'node@{}' uninstalled", success_prefix(), self.version);
+        } else {
+            warn!("No version 'node@{}' found to uninstall", self.version);
+        }
+
+        Ok(())
     }
 }
 

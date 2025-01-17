@@ -87,6 +87,12 @@ impl Tool for Npm {
             Err(ErrorKind::NotInPackage.into())
         }
     }
+    fn uninstall(self: Box<Self>, _session: &mut Session) -> Fallible<()> {
+        Err(ErrorKind::Unimplemented {
+            feature: "Uninstalling npm".into(),
+        }
+        .into())
+    }
 }
 
 impl Display for Npm {
@@ -168,6 +174,13 @@ impl Tool for BundledNpm {
             }
             None => Err(ErrorKind::NotInPackage.into()),
         }
+    }
+
+    fn uninstall(self: Box<Self>, _session: &mut Session) -> Fallible<()> {
+        Err(ErrorKind::Unimplemented {
+            feature: "Uninstalling bundled npm".into(),
+        }
+        .into())
     }
 }
 

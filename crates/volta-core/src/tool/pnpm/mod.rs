@@ -1,4 +1,5 @@
 use node_semver::Version;
+use std::env;
 use std::fmt::{self, Display};
 
 use crate::error::{ErrorKind, Fallible};
@@ -6,6 +7,7 @@ use crate::inventory::pnpm_available;
 use crate::session::Session;
 use crate::style::tool_version;
 use crate::sync::VoltaLock;
+use crate::VOLTA_FEATURE_PNPM;
 
 use super::{
     check_fetched, check_shim_reachable, debug_already_fetched, info_fetched, info_installed,
@@ -15,6 +17,7 @@ use super::{
 mod fetch;
 mod resolve;
 
+use super::package::uninstall;
 pub use resolve::resolve;
 
 /// The Tool implementation for fetching and installing pnpm
@@ -86,6 +89,17 @@ impl Tool for Pnpm {
             Ok(())
         } else {
             Err(ErrorKind::NotInPackage.into())
+        }
+    }
+
+    fn uninstall(self: Box<Self>, _session: &mut Session) -> Fallible<()> {
+        if env::var_os(VOLTA_FEATURE_PNPM).is_some() {
+            Err(ErrorKind::Unimplemented {
+                feature: "Uninstalling pnpm".into(),
+            }
+            .into())
+        } else {
+            uninstall("pnpm")
         }
     }
 }

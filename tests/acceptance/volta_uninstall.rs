@@ -1,9 +1,45 @@
 //! Tests for `volta uninstall`.
 
 use crate::support::sandbox::{sandbox, Sandbox};
+use cfg_if::cfg_if;
 use hamcrest2::assert_that;
 use hamcrest2::prelude::*;
 use test_support::matchers::execs;
+
+fn platform_with_node_npm(node: &str, npm: &str) -> String {
+    format!(
+        r#"{{
+  "node": {{
+    "runtime": "{}",
+    "npm": "{}"
+  }},
+  "pnpm": null,
+  "yarn": null
+}}"#,
+        node, npm
+    )
+}
+fn node_bin(version: &str) -> String {
+    cfg_if! {
+            if #[cfg(target_os = "windows")] {
+                format!(
+                    r#"@echo off
+echo Node version {}
+echo node args: %*
+"#,
+    version
+                )
+            } else {
+                format!(
+                    r#"#!/bin/sh
+echo "Node version {}"
+echo "node args: $@"
+"#,
+    version
+                )
+            }
+        }
+}
 
 const PKG_CONFIG_BASIC: &str = r#"{
   "name": "cowsay",
@@ -206,12 +242,30 @@ fn uninstall_package_orphaned_bins() {
 }
 
 #[test]
-fn uninstall_runtime() {
-    let s = sandbox().build();
+fn uninstall_nonexistent_runtime() {
+    let s = sandbox().env(VOLTA_LOGLEVEL, "info").build();
     assert_that!(
-        s.volta("uninstall node"),
+        s.volta("uninstall node@20.16.0"),
         execs()
-            .with_status(1)
-            .with_stderr_contains("[..]error: Uninstalling node is not supported yet.")
+            .with_status(0)
+            .with_stderr_contains("[..]No version 'node@20.16.0' found to uninstall")
     )
+}
+
+#[test]
+fn uninstall_runtime_basic() {
+    // basic uninstall - everything exists, and everything except the cached
+    // inventory files should not be deleted
+    let s = sandbox()
+        .platform(&platform_with_node_npm("20.16.0", "10.8.1"))
+        .setup_node_binary("20.16.0", "10.8.1", &node_bin("20.16.0"))
+        .env(VOLTA_LOGLEVEL, "info")
+        .build();
+
+    assert_that!(
+        s.volta("uninstall node@20.16.0"),
+        execs()
+            .with_status(0)
+            .with_stdout_contains("[..]'node@20.16.0' uninstalled")
+    );
 }

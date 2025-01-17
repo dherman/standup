@@ -108,6 +108,20 @@ impl Tool for Package {
     fn pin(self: Box<Self>, _session: &mut Session) -> Fallible<()> {
         Err(ErrorKind::CannotPinPackage { package: self.name }.into())
     }
+
+    fn uninstall(self: Box<Self>, _session: &mut Session) -> Fallible<()> {
+        // For packages, specifically report that we do not support uninstalling
+        // specific versions. For package managers, we currently
+        // *intentionally* let this fall through to inform the user that we do
+        // not support uninstalling those *at all*.
+        let VersionSpec::None = &self.version else {
+            return Err(ErrorKind::Unimplemented {
+                feature: "uninstalling specific versions of tools".into(),
+            }
+            .into());
+        };
+        uninstall(&self.name)
+    }
 }
 
 impl Display for Package {
